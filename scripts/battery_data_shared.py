@@ -170,6 +170,9 @@ def add_test_data():
     update_battery_data(1, 3, 13, 26.1, current_time)    # Kol1, Batarya1, NTC2
     update_battery_data(1, 3, 14, 24.8, current_time)    # Kol1, Batarya1, NTC3
 
+# Modül import edildiğinde test verisi ekle
+add_test_data()
+
 def print_data_summary():
     """Veri özetini yazdır"""
     summary = get_system_summary()
@@ -195,7 +198,7 @@ if __name__ == "__main__":
     print("=" * 40)
     
     # Test verisi ekle
-    add_test_data()
+    # add_test_data() # This line is now redundant as it's called at module level
     
     # Özeti yazdır
     print_data_summary()
