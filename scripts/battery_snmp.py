@@ -75,7 +75,7 @@ def get_snmp_value(oid):
             return 0
         elif oid == "1.3.6.1.4.1.99999.3.1.2.2":  # highAlarms
             return 0
-        elif oid == "1.3.6.1.4.1.99999.3.1.2.3":  # mediumAlarms
+        elif oid == "1.6.1.4.1.99999.3.1.2.3":  # mediumAlarms
             return 0
         elif oid == "1.3.6.1.4.1.99999.3.1.2.4":  # lowAlarms
             return 0
@@ -88,21 +88,55 @@ def get_snmp_value(oid):
 
 def main():
     """Ana fonksiyon - pass direktifi için"""
-    if len(sys.argv) != 2:
-        print("NONE")
-        sys.exit(1)
-    
-    oid = sys.argv[1]
-    value = get_snmp_value(oid)
-    
-    if value is None:
-        print("NONE")
-    else:
-        # Değer tipine göre çıktı formatla
-        if isinstance(value, str):
-            print(f"STRING: {value}")
+    if len(sys.argv) > 1 and sys.argv[1] == "-g":
+        # SNMP GET mode - SNMPD tarafından çağrılır
+        oid = sys.argv[2] if len(sys.argv) > 2 else ""
+        value = get_snmp_value(oid)
+        
+        if value is None:
+            print("NONE")
         else:
-            print(f"INTEGER: {value}")
+            # SNMP pass formatı: OID, tip, değer
+            print(oid)
+            if isinstance(value, str):
+                print("STRING")
+                print(value)
+            else:
+                print("INTEGER")
+                print(value)
+                
+    elif len(sys.argv) > 1 and sys.argv[1] == "-n":
+        # SNMP GETNEXT mode
+        print("NONE")
+        
+    else:
+        # Eski stdin mode (geriye uyumluluk için)
+        for line in sys.stdin:
+            line = line.strip()
+            if not line:
+                continue
+            parts = line.split()
+            if len(parts) >= 2:
+                command = parts[0].upper()
+                oid = parts[1]
+                if command == "GET":
+                    value = get_snmp_value(oid)
+                    if value is None:
+                        print("NONE")
+                    else:
+                        if isinstance(value, str):
+                            print("STRING")
+                            print(value)
+                        else:
+                            print("INTEGER")
+                            print(value)
+                    sys.stdout.flush()
+                elif command == "GETNEXT":
+                    print("NONE")
+                    sys.stdout.flush()
+                else:
+                    print("NONE")
+                    sys.stdout.flush()
 
 if __name__ == "__main__":
     main()
