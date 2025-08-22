@@ -1,0 +1,194 @@
+BATTERY-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, enterprises
+        FROM SNMPv2-SMI
+    Integer32, Unsigned32, Gauge32, TimeTicks
+        FROM SNMPv2-TC
+    DisplayString, TextualConvention
+        FROM SNMPv2-TC;
+
+batteryManagement MODULE-IDENTITY
+    LAST-UPDATED "202412010000Z"
+    ORGANIZATION "Battery Management System"
+    CONTACT-INFO "Email: admin@example.com"
+    DESCRIPTION
+        "MIB for Battery Management System running on Raspberry Pi"
+    REVISION "202412010000Z"
+    DESCRIPTION
+        "Updated version with k=2 and k>2 data types"
+    ::= { enterprises 99999 }
+
+-- Ana gruplar
+batterySystem OBJECT IDENTIFIER ::= { batteryManagement 1 }
+batteryData OBJECT IDENTIFIER ::= { batteryManagement 2 }
+batteryAlarms OBJECT IDENTIFIER ::= { batteryManagement 3 }
+
+-- Sistem bilgileri
+systemInfo OBJECT IDENTIFIER ::= { batterySystem 1 }
+
+totalBatteryCount OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Toplam batarya sayısı (k>2 olan veriler)"
+    ::= { systemInfo 1 }
+
+totalArmCount OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Toplam kol sayısı (genellikle 4)"
+    ::= { systemInfo 2 }
+
+systemStatus OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Sistem durumu: 1=Normal, 2=Uyarı, 3=Kritik, 4=Hata"
+    ::= { systemInfo 3 }
+
+lastUpdateTime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Son veri güncelleme zamanı (centiseconds since boot)"
+    ::= { systemInfo 4 }
+
+-- Veri tablosu
+dataInfo OBJECT IDENTIFIER ::= { batteryData 1 }
+
+batteryDataTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BatteryDataEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Tüm battery ve arm verileri tablosu"
+    ::= { dataInfo 1 }
+
+batteryDataEntry OBJECT-TYPE
+    SYNTAX BatteryDataEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Battery/Arm veri girişi"
+    INDEX { dataArmIndex, dataBatteryIndex, dataType }
+    ::= { batteryDataTable 1 }
+
+BatteryDataEntry ::= SEQUENCE {
+    dataArmIndex Unsigned32,
+    dataBatteryIndex Unsigned32,
+    dataType Unsigned32,
+    dataValue Integer32,
+    dataUnit DisplayString,
+    dataTimestamp TimeTicks
+}
+
+dataArmIndex OBJECT-TYPE
+    SYNTAX Unsigned32 (1..4)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Kol indeksi (1-4)"
+    ::= { batteryDataEntry 1 }
+
+dataBatteryIndex OBJECT-TYPE
+    SYNTAX Unsigned32 (0..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Batarya indeksi (0=Kol verisi, 2=Kol sensörleri, 3-255=Batarya verisi)"
+    ::= { batteryDataEntry 2 }
+
+dataType OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Veri tipi: 100-199=Kol verisi, 10-12=k=2 verileri, 126,11-14=k>2 verileri"
+    ::= { batteryDataEntry 3 }
+
+dataValue OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Veri değeri"
+    ::= { batteryDataEntry 4 }
+
+dataUnit OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..20))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Veri birimi"
+    ::= { batteryDataEntry 5 }
+
+dataTimestamp OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Veri zaman damgası"
+    ::= { batteryDataEntry 6 }
+
+-- Veri sayısı
+dataCount OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Toplam veri kayıt sayısı"
+    ::= { dataInfo 2 }
+
+-- Alarm bilgileri
+alarmInfo OBJECT IDENTIFIER ::= { batteryAlarms 1 }
+
+alarmCount OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Toplam aktif alarm sayısı"
+    ::= { alarmInfo 1 }
+
+-- Alarm kritiklik özeti
+alarmSeveritySummary OBJECT IDENTIFIER ::= { batteryAlarms 2 }
+
+criticalAlarms OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Kritik seviye alarm sayısı (Seviye 4)"
+    ::= { alarmSeveritySummary 1 }
+
+highAlarms OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Yüksek seviye alarm sayısı (Seviye 3)"
+    ::= { alarmSeveritySummary 2 }
+
+mediumAlarms OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Orta seviye uyarı sayısı (Seviye 2)"
+    ::= { alarmSeveritySummary 3 }
+
+lowAlarms OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Düşük seviye alarm sayısı (Seviye 1)"
+    ::= { alarmSeveritySummary 4 }
+
+END
