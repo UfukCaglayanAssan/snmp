@@ -19,17 +19,17 @@ DATA_TYPES = {
     103: "Arm Humidity",
     
     # k=2 verileri (Kol verileri)
-    10: "Akım (A)",
-    11: "Nem (%)",
-    12: "Sıcaklık (°C)",
+    20: "Kol Akım (A)",      # 10 yerine 20 kullanıyoruz
+    21: "Kol Nem (%)",        # 11 yerine 21 kullanıyoruz
+    22: "Kol Sıcaklık (°C)", # 12 yerine 22 kullanıyoruz
     
     # k>2 verileri (Batarya verileri)
     126: "SOC (State of Charge)",
-    11: "SOH (State of Health)",
-    12: "NTC1 (Temperature)",
-    13: "NTC2 (Temperature)",
-    14: "NTC3 (Temperature)",
-    10: "Gerilim (V)"
+    127: "SOH (State of Health)",    # 11 yerine 127 kullanıyoruz
+    128: "NTC1 (Temperature)",       # 12 yerine 128 kullanıyoruz
+    129: "NTC2 (Temperature)",       # 13 yerine 129 kullanıyoruz
+    130: "NTC3 (Temperature)",       # 14 yerine 130 kullanıyoruz
+    131: "Batarya Gerilim (V)"       # 10 yerine 131 kullanıyoruz
 }
 
 def update_battery_data(arm, k, dtype, data_value, timestamp=None):
@@ -40,17 +40,17 @@ def update_battery_data(arm, k, dtype, data_value, timestamp=None):
         timestamp = int(time.time() * 1000)
     
     # Veri birimini belirle
-    if dtype == 10 and k == 2:  # k=2, Akım
+    if dtype == 20:  # k=2, Kol Akım
         unit = "A"
-    elif dtype == 11 and k == 2:  # k=2, Nem
+    elif dtype == 21:  # k=2, Kol Nem
         unit = "%"
-    elif dtype == 12 and k == 2:  # k=2, Sıcaklık
+    elif dtype == 22:  # k=2, Kol Sıcaklık
         unit = "°C"
-    elif dtype == 10 and k > 2:  # k>2, Gerilim
+    elif dtype == 131:  # k>2, Batarya Gerilim
         unit = "V"
-    elif dtype == 11 and k > 2:  # k>2, SOH
+    elif dtype == 127:  # k>2, SOH
         unit = "%"
-    elif dtype in [12, 13, 14] and k > 2:  # k>2, NTC sıcaklık
+    elif dtype in [128, 129, 130]:  # k>2, NTC sıcaklık
         unit = "°C"
     elif dtype == 126:  # SOC
         unit = "%"
@@ -169,17 +169,17 @@ def add_test_data():
     update_battery_data(2, 0, 101, 1, current_time)      # Kol2, Durum (Aktif)
     
     # k=2 verileri (Kol verileri)
-    update_battery_data(1, 2, 10, 25.5, current_time)    # Kol1, k=2, Akım
-    update_battery_data(1, 2, 11, 65.2, current_time)    # Kol1, k=2, Nem
-    update_battery_data(1, 2, 12, 28.1, current_time)    # Kol1, k=2, Sıcaklık
+    update_battery_data(1, 2, 20, 25.5, current_time)    # Kol1, k=2, Akım
+    update_battery_data(1, 2, 21, 65.2, current_time)    # Kol1, k=2, Nem
+    update_battery_data(1, 2, 22, 28.1, current_time)    # Kol1, k=2, Sıcaklık
     
     # k>2 verileri (Batarya verileri)
-    update_battery_data(1, 3, 10, 12.8, current_time)    # Kol1, Batarya1, Gerilim
+    update_battery_data(1, 3, 131, 12.8, current_time)    # Kol1, Batarya1, Gerilim
     update_battery_data(1, 3, 126, 85.2, current_time)   # Kol1, Batarya1, SOC
-    update_battery_data(1, 3, 11, 92.1, current_time)    # Kol1, Batarya1, SOH
-    update_battery_data(1, 3, 12, 25.5, current_time)    # Kol1, Batarya1, NTC1
-    update_battery_data(1, 3, 13, 26.1, current_time)    # Kol1, Batarya1, NTC2
-    update_battery_data(1, 3, 14, 24.8, current_time)    # Kol1, Batarya1, NTC3
+    update_battery_data(1, 3, 127, 92.1, current_time)    # Kol1, Batarya1, SOH
+    update_battery_data(1, 3, 128, 25.5, current_time)    # Kol1, Batarya1, NTC1
+    update_battery_data(1, 3, 129, 26.1, current_time)    # Kol1, Batarya1, NTC2
+    update_battery_data(1, 3, 130, 24.8, current_time)    # Kol1, Batarya1, NTC3
 
 # Modül import edildiğinde test verisi ekle
 add_test_data()
