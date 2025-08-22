@@ -11,7 +11,7 @@ import os
 
 # Gerçek veriyi oku
 try:
-    from battery_data_shared import battery_data, DATA_TYPES, get_data_count, get_system_summary
+    from battery_data_shared import battery_data, DATA_TYPES, get_data_count, get_system_summary, get_last_update_time_formatted
 except ImportError:
     print("HATA: battery_data_shared modülü bulunamadı!")
     sys.exit(1)
@@ -34,10 +34,7 @@ def get_system_status():
 
 def get_last_update_time():
     """Son güncelleme zamanını döndür"""
-    if battery_data:
-        latest_time = max([v[2] for v in battery_data.values()])
-        return int((time.time() * 1000 - latest_time) / 10)  # centiseconds
-    return 0
+    return get_last_update_time_formatted()
 
 def get_snmp_value(oid):
     """SNMP OID için değer döndür"""

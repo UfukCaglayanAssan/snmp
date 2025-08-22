@@ -125,6 +125,17 @@ def get_last_update_time():
     latest_time = max([v[2] for v in battery_data.values()])
     return latest_time
 
+def get_last_update_time_formatted():
+    """Son güncelleme zamanını formatlanmış olarak döndür"""
+    summary = get_system_summary()
+    timestamp = summary.get('last_update', 0)
+    
+    if timestamp > 0:
+        dt = datetime.fromtimestamp(timestamp/1000)
+        return dt.strftime('%Y-%m-%d %H:%M:%S')
+    else:
+        return "Veri yok"
+
 def get_system_summary():
     """Sistem özetini döndür"""
     if not battery_data:
