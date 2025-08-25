@@ -21,9 +21,9 @@ def get_snmp_value(oid):
     try:
         print(f"DEBUG: get_snmp_value called with OID: {oid}", file=sys.stderr)
         
-        # OID'den .0 son ekini kaldır
-        oid = oid.rstrip('.0')
-        print(f"DEBUG: OID after stripping .0: {oid}", file=sys.stderr)
+        # OID'den .0 son ekini ve başındaki noktayı kaldır
+        oid = oid.rstrip('.0').lstrip('.')
+        print(f"DEBUG: OID after cleaning: {oid}", file=sys.stderr)
 
         # Sistem bilgileri - gerçek verilerden hesapla
         if oid == "1.3.6.1.4.1.99999.1.1.1":  # totalBatteryCount
