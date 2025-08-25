@@ -139,44 +139,25 @@ def get_snmp_value(oid):
 
 def main():
     """Ana fonksiyon - pass direktifi için"""
-    # SNMPD çağrıldığında log yaz
-    with open('/tmp/snmp_debug.log', 'a') as f:
-        f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} - Script called with args: {sys.argv}\n")
-        f.flush()
-    
     if len(sys.argv) > 1 and sys.argv[1] == "-g":
         # SNMPD'den gelen OID isteği
         if len(sys.argv) > 2:
             oid = sys.argv[2]
-            with open('/tmp/snmp_debug.log', 'a') as f:
-                f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} - OID requested: {oid}\n")
-                f.flush()
+            value = get_snmp_value(oid)
             
-            # OID'ye göre değer döndür
-            if oid == ".1.3.6.1.4.1.99999.1.1.1":
-                result = get_snmp_value(oid)
-            elif oid == ".1.3.6.1.4.1.99999.1.1.2":
-                result = get_snmp_value(oid)
-            elif oid == ".1.3.6.1.4.1.99999.1.1.3":
-                result = get_snmp_value(oid)
-            elif oid == ".1.3.6.1.4.1.99999.1.1.4":
-                result = get_snmp_value(oid)
-            elif oid == ".1.3.6.1.4.1.99999.2.2":
-                result = get_snmp_value(oid)
-            elif oid.startswith(".1.3.6.1.4.1.99999.3.1.1"):
-                result = get_snmp_value(oid)
-            elif oid.startswith(".1.3.6.1.4.1.99999.3.1.2"):
-                result = get_snmp_value(oid)
+            if value is None:
+                print("NONE")
             else:
-                result = 0  # Şimdilik sabit
-            
-            with open('/tmp/snmp_debug.log', 'a') as f:
-                f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} - Returning result: {result}\n")
-                f.flush()
-            
-            print(f"INTEGER: {result}")
+                # SNMP pass formatı: OID, tip, değer
+                print(oid)
+                if isinstance(value, str):
+                    print("STRING")
+                    print(value)
+                else:
+                    print("INTEGER")
+                    print(value)
         else:
-            print("INTEGER: 0")
+            print("NONE")
     else:
         # Normal çalıştırma
         print("Battery SNMP Agent başlatıldı...")
