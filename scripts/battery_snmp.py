@@ -103,7 +103,7 @@ def main():
         # SNMP GET mode - SNMPD tarafından çağrılır
         oid = sys.argv[2] if len(sys.argv) > 2 else ""
         value = get_snmp_value(oid)
-        
+
         if value is None:
             print("NONE")
         else:
@@ -115,11 +115,11 @@ def main():
             else:
                 print("INTEGER")
                 print(value)
-                
+
     elif len(sys.argv) > 1 and sys.argv[1] == "-n":
         # SNMP GETNEXT mode
         print("NONE")
-        
+
     else:
         # Stdin mode
         for line in sys.stdin:
