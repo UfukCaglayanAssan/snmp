@@ -7,9 +7,17 @@ Bu script SNMP pass direktifi için kullanılır
 import sys
 import os
 
-# Gerçek veriyi oku
+# Gerçek veriyi oku - debug mesajlarını stderr'e yönlendir
 try:
+    # stdout'u geçici olarak stderr'e yönlendir
+    old_stdout = sys.stdout
+    sys.stdout = sys.stderr
+    
     from battery_data_shared import battery_data, DATA_TYPES, get_data_count, get_system_summary, get_last_update_time_formatted
+    
+    # stdout'u geri al
+    sys.stdout = old_stdout
+    
 except ImportError:
     print("NONE", file=sys.stderr)
     sys.exit(1)
