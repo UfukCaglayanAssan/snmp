@@ -11,7 +11,7 @@ import os
 try:
     from battery_data_shared import battery_data, DATA_TYPES, get_data_count, get_system_summary, get_last_update_time_formatted
 except ImportError:
-    print("NONE")
+    print("NONE", file=sys.stderr)
     sys.exit(1)
 
 def get_battery_count():
@@ -75,7 +75,7 @@ def get_snmp_value(oid):
             return 0
         elif oid == "1.3.6.1.4.1.99999.3.1.2.2":  # highAlarms
             return 0
-        elif oid == "1.6.1.4.1.99999.3.1.2.3":  # mediumAlarms
+        elif oid == "1.3.6.1.4.1.99999.3.1.2.3":  # mediumAlarms
             return 0
         elif oid == "1.3.6.1.4.1.99999.3.1.2.4":  # lowAlarms
             return 0
