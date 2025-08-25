@@ -6,6 +6,7 @@ Bu script SNMP pass direktifi için kullanılır ve gerçek batarya verilerini d
 
 import sys
 import os
+import time
 
 # battery_data_shared modülünü import et
 try:
@@ -138,55 +139,69 @@ def get_snmp_value(oid):
 
 def main():
     """Ana fonksiyon - pass direktifi için"""
+    # SNMPD çağrıldığında log yaz
+    with open('/tmp/snmp_debug.log', 'a') as f:
+        f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} - Script called with args: {sys.argv}\n")
+        f.flush()
+    
     if len(sys.argv) > 1 and sys.argv[1] == "-g":
-        # SNMP GET mode - SNMPD tarafından çağrılır
-        oid = sys.argv[2] if len(sys.argv) > 2 else ""
-        value = get_snmp_value(oid)
-
-        if value is None:
-            print("NONE")
-        else:
-            # SNMP pass formatı: OID, tip, değer
-            print(oid)
-            if isinstance(value, str):
-                print("STRING")
-                print(value)
+        # SNMPD'den gelen OID isteği
+        if len(sys.argv) > 2:
+            oid = sys.argv[2]
+            with open('/tmp/snmp_debug.log', 'a') as f:
+                f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} - OID requested: {oid}\n")
+                f.flush()
+            
+            # OID'ye göre değer döndür
+            if oid == ".1.3.6.1.4.1.99999.1.1.1":
+                result = get_snmp_value(oid)
+            elif oid == ".1.3.6.1.4.1.99999.1.1.2":
+                result = get_snmp_value(oid)
+            elif oid == ".1.3.6.1.4.1.99999.1.1.3":
+                result = get_snmp_value(oid)
+            elif oid == ".1.3.6.1.4.1.99999.1.1.4":
+                result = get_snmp_value(oid)
+            elif oid == ".1.3.6.1.4.1.99999.2.2":
+                result = get_snmp_value(oid)
+            elif oid.startswith(".1.3.6.1.4.1.99999.3.1.1"):
+                result = get_snmp_value(oid)
+            elif oid.startswith(".1.3.6.1.4.1.99999.3.1.2"):
+                result = get_snmp_value(oid)
             else:
-                print("INTEGER")
-                print(value)
-
-    elif len(sys.argv) > 1 and sys.argv[1] == "-n":
-        # SNMP GETNEXT mode
-        print("NONE")
-
+                result = 0  # Şimdilik sabit
+            
+            with open('/tmp/snmp_debug.log', 'a') as f:
+                f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} - Returning result: {result}\n")
+                f.flush()
+            
+            print(f"INTEGER: {result}")
+        else:
+            print("INTEGER: 0")
     else:
-        # Stdin mode
-        for line in sys.stdin:
-            line = line.strip()
-            if not line:
-                continue
-            parts = line.split()
-            if len(parts) >= 2:
-                command = parts[0].upper()
-                oid = parts[1]
-                if command == "GET":
-                    value = get_snmp_value(oid)
-                    if value is None:
-                        print("NONE")
-                    else:
-                        if isinstance(value, str):
-                            print("STRING")
-                            print(value)
-                        else:
-                            print("INTEGER")
-                            print(value)
-                    sys.stdout.flush()
-                elif command == "GETNEXT":
-                    print("NONE")
-                    sys.stdout.flush()
-                else:
-                    print("NONE")
-                    sys.stdout.flush()
+        # Normal çalıştırma
+        print("Battery SNMP Agent başlatıldı...")
+        print("=" * 40)
+        
+        # Veri sayılarını göster
+        print(f"Toplam kayıt: {get_snmp_value('1.3.6.1.4.1.99999.2.2')}")
+        print(f"Kol sayısı: {get_snmp_value('1.3.6.1.4.1.99999.1.1.2')}")
+        print(f"Batarya sayısı: {get_snmp_value('1.3.6.1.4.1.99999.1.1.1')}")
+        
+        # SNMP Test OID'leri
+        print("\nSNMP Test OID'leri:")
+        print(f"1.3.6.1.4.1.99999.1.1.1.0: {get_snmp_value('1.3.6.1.4.1.99999.1.1.1')}")
+        print(f"1.3.6.1.4.1.99999.1.1.2.0: {get_snmp_value('1.3.6.1.4.1.99999.1.1.2')}")
+        print(f"1.3.6.1.4.1.99999.1.1.3.0: {get_snmp_value('1.3.6.1.4.1.99999.1.1.3')}")
+        print(f"1.3.6.1.4.1.99999.2.1.2.0: {get_snmp_value('1.3.6.1.4.1.99999.2.2')}")
+        
+        print("\nSNMP Agent hazır. Veri bekleniyor...")
+        print("Ctrl+C ile durdurun.")
+        
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            print("\nSNMP Agent durduruldu.")
 
 if __name__ == "__main__":
     main()
